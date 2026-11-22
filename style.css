@@ -765,12 +765,14 @@ a {
   .form-heading h1 {
     font-size: 38px;
   }
-  .footer-inner {
+    .footer-inner {
     align-items: flex-start;
     flex-direction: column;
   }
+}
 
-  .address-link {
+/* Посилання на адресу */
+.address-link {
     color: inherit;
     text-decoration: none;
     transition: color 0.2s ease;

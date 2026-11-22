@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="uk">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Доступно у Львові</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="index.html"
+                    ><span class="brand-mark">↗</span><span>доступно<span class="brand-city">.львів</span></span></a
+                >
+                <nav class="main-nav">
+                    <a class="active" href="index.html">Каталог</a
+                    ><a class="add-link" href="add.html">＋ Додати приклад</a>
+                </nav>
+            </div>
+        </header>
+        <section class="hero">
+            <div class="container hero-inner">
+                <div class="hero-copy">
+                    <span class="eyebrow">⌖ ЛЬВІВ · МІСЬКИЙ КАТАЛОГ</span>
+                    <h1>Місто, у якому<br /><em>доступно кожному.</em></h1>
+                    <p>Знаходьте місця, де про доступність подбали, та показуйте, де ще є бар’єри.</p>
+                    <a href="#catalog" class="button button-primary">Переглянути каталог <span>↓</span></a>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                    <div class="art-circle art-circle-one"></div>
+                    <div class="art-circle art-circle-two"></div>
+                    <div class="art-note">
+                        <span>Львів</span><strong>без<br />бар’єрів</strong><small>простір для всіх</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <main id="catalog" class="container catalog-section">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">ДОСЛІДЖУЙТЕ МІСТО</span>
+                    <h2>Каталог прикладів</h2>
+                </div>
+                <p>Реальні місця та досвід відвідувачів</p>
+            </div>
+            <div class="filter-panel">
+                <label class="search-box"
+                    ><span>⌕</span><input id="search" type="search" placeholder="Назва або адреса..."
+                /></label>
+                <div class="filter-row">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-status="">Усі приклади</button
+                        ><button class="filter-tab" data-status="accessible">Вдалі рішення</button
+                        ><button class="filter-tab" data-status="inaccessible">Невдалі рішення</button>
+                    </div>
+                    <label class="category-select"
+                        >☷
+                        <select id="category">
+                            <option value="">Усі категорії</option>
+                            <option value="food">Заклади харчування</option>
+                            <option value="shop">Магазини</option>
+                            <option value="culture">Культура</option>
+                            <option value="health">Медицина</option>
+                            <option value="public">Громадські простори</option>
+                            <option value="other">Інше</option>
+                        </select></label
+                    >
+                </div>
+            </div>
+            <p id="message" class="result-count" role="status">Завантажуємо приклади…</p>
+            <div id="places" class="places-grid" aria-live="polite"></div>
+        </main>
+        <footer class="site-footer">
+            <div class="container footer-inner">
+                <span>доступно.львів</span>
+                <p>Місто без бар’єрів починається з уваги одне до одного.</p>
+            </div>
+        </footer>
+        <script type="module" src="app.js"></script>
+    </body>
+</html>

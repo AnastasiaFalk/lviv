@@ -1054,4 +1054,115 @@ a {
   .accessibility-option {
     font-size: 15px;
   }
+
+  /* HIGH CONTRAST MODE */
+  
+  body.high-contrast {
+      background: #ffffff;
+      color: #000000;
+  }
+  
+  .high-contrast .site-header,
+  .high-contrast .place-card,
+  .high-contrast .filter-panel,
+  .high-contrast .place-form {
+      background: #ffffff;
+      border: 2px solid #000000;
+      box-shadow: none;
+  }
+  
+  .high-contrast .brand,
+  .high-contrast .main-nav a,
+  .high-contrast .place-content h3,
+  .high-contrast .place-description,
+  .high-contrast .place-address,
+  .high-contrast .form-heading h1,
+  .high-contrast .form-heading p,
+  .high-contrast .field label,
+  .high-contrast .field legend,
+  .high-contrast .category-label,
+  .high-contrast .result-count,
+  .high-contrast .section-heading h2 {
+      color: #000000;
+  }
+  
+  .high-contrast a {
+      color: #0000cc;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+  }
+  
+  .high-contrast .button,
+  .high-contrast .add-link,
+  .high-contrast .contrast-toggle {
+      background: #000000;
+      color: #ffffff;
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast .contrast-toggle {
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+  }
+  
+  .high-contrast input,
+  .high-contrast textarea,
+  .high-contrast select {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast input::placeholder,
+  .high-contrast textarea::placeholder {
+      color: #444444;
+      opacity: 1;
+  }
+  
+  .high-contrast .filter-tab {
+      color: #000000;
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast .filter-tab.active {
+      background: #000000;
+      color: #ffffff;
+  }
+  
+  .high-contrast .status-positive,
+  .high-contrast .status-negative {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast .accessibility-features li {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast .accessibility-field {
+      border: 2px solid #000000;
+  }
+  
+  .high-contrast .site-footer {
+      background: #000000;
+      color: #ffffff;
+  }
+  
+  .high-contrast .site-footer p {
+      color: #ffffff;
+  }
+  
+  .high-contrast :focus-visible {
+      outline: 4px solid #e00000;
+      outline-offset: 4px;
+  }
+
 }

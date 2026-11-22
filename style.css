@@ -4,7 +4,7 @@
 }
 
 :root {
-  --accessibility-legend-size: 18px;
+  --label-size: 16px;
   font-family: "DM Sans", Arial, sans-serif;
   color: #202923;
   background: #f7f8f5;
@@ -603,10 +603,14 @@ a {
   margin-bottom: 0;
 }
 
+/* ЄДИНИЙ РОЗМІР НАЗВ ПОЛІВ І ЗАГОЛОВКІВ */
+
 .field label,
-.field legend {
-  font-size: 14px;
+.field legend,
+.accessibility-field > legend {
+  font-size: var(--label-size);
   font-weight: 700;
+  line-height: 1.4;
   color: #344238;
 }
 
@@ -633,13 +637,6 @@ a {
   min-height: 125px;
 }
 
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  border-color: #56845c;
-  box-shadow: 0 0 0 3px #56845c20;
-}
-
 .field fieldset {
   border: 0;
   padding: 0;
@@ -648,6 +645,13 @@ a {
 .field fieldset legend {
   padding: 0;
   margin-bottom: 8px;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: #56845c;
+  box-shadow: 0 0 0 3px #56845c20;
 }
 
 /* STATUS CHOICES */
@@ -803,15 +807,9 @@ a {
   min-width: 0;
 }
 
-/* ОБИДВА ЗАГОЛОВКИ ОДНАКОВОГО РОЗМІРУ */
-
 .accessibility-field > legend {
   padding: 0 8px;
   margin-bottom: 8px;
-  font-size: var(--accessibility-legend-size);
-  line-height: 1.4;
-  font-weight: 700;
-  color: #344238;
 }
 
 .accessibility-field i {
@@ -1063,7 +1061,7 @@ a {
     padding: 14px;
   }
 
-   .accessibility-option {
+  .accessibility-option {
     font-size: 15px;
   }
 }
@@ -1107,7 +1105,8 @@ body.high-contrast {
 .high-contrast .form-heading h1,
 .high-contrast .form-heading p,
 .high-contrast .field label,
-.high-contrast .field legend {
+.high-contrast .field legend,
+.high-contrast .accessibility-field > legend {
   color: #000000;
 }
 

@@ -107,7 +107,17 @@ async function loadPlaces() {
                         <p class="place-description">${esc(p.description)}</p>
 
                         <div class="place-address">
-                            ⌖ <span>${esc(p.address)}</span>
+                            ⌖
+                            ${
+                                p.maps_url
+                                    ? `<a
+                                        href="${esc(p.maps_url)}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="address-link"
+                                    >${esc(p.address)}</a>`
+                                    : `<span>${esc(p.address)}</span>`
+                            }
                         </div>
 
                         ${

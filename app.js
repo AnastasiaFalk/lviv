@@ -17,6 +17,14 @@ const esc = (s) =>
         "'": "&#39;"
     })[c]);
 
+const accessibilityFeatureNames = {
+    step_free_entrance: "Вхід без сходинок",
+    ramp: "Є пандус",
+    accessible_toilet: "Доступний туалет",
+    wide_passage: "Широкий прохід",
+    elevator: "Є ліфт"
+};
+
 const categoryNames = {
     food: "Заклад харчування",
     shop: "Магазин",

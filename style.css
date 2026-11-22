@@ -1054,10 +1054,11 @@ a {
   .accessibility-option {
     font-size: 15px;
   }
+}
 
-  /* HIGH CONTRAST MODE */
-  
-  body.high-contrast {
+/* HIGH CONTRAST MODE */
+
+body.high-contrast {
       background: #ffffff;
       color: #000000;
   }

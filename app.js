@@ -225,7 +225,8 @@ function setupForm() {
                 {
                     method: "POST",
                     headers: {
-                        apikey: SUPABASE_ANON_KEY
+                        apikey: SUPABASE_ANON_KEY,
+                        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
                     },
                     body: formData
                 }

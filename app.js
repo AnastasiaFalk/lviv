@@ -257,7 +257,7 @@ function setupForm() {
             }
 
             msg.textContent =
-                "Дякуємо! Приклад успішно надіслано ❤️";
+                "Дякуємо! Приклад успішно надіслано";
 
         } catch (error) {
             console.error("Помилка надсилання:", error);

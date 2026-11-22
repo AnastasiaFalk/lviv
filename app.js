@@ -113,6 +113,21 @@ async function loadPlaces() {
 
                         <h3>${esc(p.name)}</h3>
                         <p class="place-description">${esc(p.description)}</p>
+                        ${
+                            Array.isArray(p.accessibility_features) &&
+                            p.accessibility_features.length
+                                ? `<div class="accessibility-features">
+                                    <h4>Характеристики доступності</h4>
+                                    <ul>
+                                        ${p.accessibility_features
+                                            .filter((feature) => accessibilityFeatureNames[feature])
+                                            .map((feature) => `
+                                                <li>${esc(accessibilityFeatureNames[feature])}</li>
+                                            `).join("")}
+                                    </ul>
+                                </div>`
+                                : ""
+                        }
                         <div class="place-address">
                             ⌖
                             ${

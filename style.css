@@ -1056,34 +1056,47 @@ a {
   }
 }
 
-/* HIGH CONTRAST MODE */
 
-body.high-contrast {
+  /* HIGH CONTRAST MODE */
+  
+  html:has(body.high-contrast) {
+      background: #ffffff;
+      color: #000000;
+  }
+  
+  body.high-contrast {
       background: #ffffff;
       color: #000000;
   }
   
   .high-contrast .site-header,
-  .high-contrast .place-card,
+  .high-contrast .hero,
   .high-contrast .filter-panel,
-  .high-contrast .place-form {
+  .high-contrast .place-card,
+  .high-contrast .place-form,
+  .high-contrast .accessibility-field {
       background: #ffffff;
+      color: #000000;
       border: 2px solid #000000;
       box-shadow: none;
   }
   
+  .high-contrast .hero h1,
+  .high-contrast .hero h1 em,
+  .high-contrast .hero-copy > p,
+  .high-contrast .eyebrow,
   .high-contrast .brand,
   .high-contrast .main-nav a,
+  .high-contrast .section-heading h2,
   .high-contrast .place-content h3,
   .high-contrast .place-description,
   .high-contrast .place-address,
+  .high-contrast .category-label,
+  .high-contrast .result-count,
   .high-contrast .form-heading h1,
   .high-contrast .form-heading p,
   .high-contrast .field label,
-  .high-contrast .field legend,
-  .high-contrast .category-label,
-  .high-contrast .result-count,
-  .high-contrast .section-heading h2 {
+  .high-contrast .field legend {
       color: #000000;
   }
   
@@ -1091,7 +1104,6 @@ body.high-contrast {
       color: #0000cc;
       text-decoration: underline;
       text-decoration-thickness: 2px;
-      text-underline-offset: 3px;
   }
   
   .high-contrast .button,
@@ -1106,7 +1118,6 @@ body.high-contrast {
       min-height: 44px;
       padding: 0 12px;
       border-radius: 8px;
-      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
   }
@@ -1126,6 +1137,7 @@ body.high-contrast {
   }
   
   .high-contrast .filter-tab {
+      background: #ffffff;
       color: #000000;
       border: 2px solid #000000;
   }
@@ -1136,19 +1148,10 @@ body.high-contrast {
   }
   
   .high-contrast .status-positive,
-  .high-contrast .status-negative {
-      background: #ffffff;
-      color: #000000;
-      border: 2px solid #000000;
-  }
-  
+  .high-contrast .status-negative,
   .high-contrast .accessibility-features li {
       background: #ffffff;
       color: #000000;
-      border: 2px solid #000000;
-  }
-  
-  .high-contrast .accessibility-field {
       border: 2px solid #000000;
   }
   

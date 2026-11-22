@@ -299,3 +299,31 @@ function setupForm() {
 
 loadPlaces();
 setupForm();
+
+
+function setupContrastMode() {
+    const button = document.querySelector("#contrast-toggle");
+    if (!button) return;
+
+    const applyContrast = (enabled) => {
+        document.body.classList.toggle("high-contrast", enabled);
+
+        button.setAttribute("aria-pressed", String(enabled));
+        button.textContent = enabled
+            ? "Звичайний режим"
+            : "Високий контраст";
+    };
+
+    const savedMode = localStorage.getItem("high-contrast") === "true";
+
+    applyContrast(savedMode);
+
+    button.addEventListener("click", () => {
+        const enabled = !document.body.classList.contains("high-contrast");
+
+        localStorage.setItem("high-contrast", String(enabled));
+        applyContrast(enabled);
+    });
+}
+
+setupContrastMode();

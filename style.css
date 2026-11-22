@@ -780,34 +780,4 @@ a {
       color: #2d6845;
       text-decoration: underline;
   }
-
-  .brand-mark {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    position: relative;
-  }
-
-  .brand-mark::before {
-      content: "";
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-top: 2px solid currentColor;
-      border-right: 2px solid currentColor;
-      top: 2px;
-      right: 2px;
-  }
-  
-  .brand-mark::after {
-      content: "";
-      position: absolute;
-      width: 15px;
-      height: 2px;
-      background: currentColor;
-      transform: rotate(-45deg);
-      transform-origin: right center;
-      top: 8px;
-      left: 0;
-  }
 }

@@ -802,10 +802,13 @@ a {
   min-width: 0;
 }
 
-/* Єдиний розмір заголовків груп у формі */
+/* ОБИДВА ЗАГОЛОВКИ ОДНАКОВОГО РОЗМІРУ */
 
-.accessibility-field legend {
-  font-size: 18px;
+.accessibility-field > legend {
+  padding: 0 8px;
+  margin-bottom: 8px;
+  font-size: 18px !important;
+  line-height: 1.4;
   font-weight: 700;
   color: #344238;
 }
@@ -1059,8 +1062,9 @@ a {
     padding: 14px;
   }
 
-  .accessibility-field legend {
-    font-size: 16px;
+  /* На мобільному теж 18px */
+  .accessibility-field > legend {
+    font-size: 18px !important;
   }
 
   .accessibility-option {

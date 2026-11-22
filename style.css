@@ -1046,9 +1046,9 @@ a {
     padding: 22px 18px;
   }
 
-  .choice-row {
+  .field .choice-row {
     grid-template-columns: 1fr;
-  }
+}
 
   .form-heading {
     margin: 22px auto 28px;

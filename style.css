@@ -4,6 +4,7 @@
 }
 
 :root {
+  --accessibility-legend-size: 18px;
   font-family: "DM Sans", Arial, sans-serif;
   color: #202923;
   background: #f7f8f5;
@@ -807,7 +808,7 @@ a {
 .accessibility-field > legend {
   padding: 0 8px;
   margin-bottom: 8px;
-  font-size: 18px !important;
+  font-size: var(--accessibility-legend-size);
   line-height: 1.4;
   font-weight: 700;
   color: #344238;

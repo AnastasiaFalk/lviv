@@ -1195,23 +1195,36 @@ a {
       text-decoration: none !important;
   }
 
-  /* Кнопка перемикання контрасту — звичайний режим */
+    /* Кнопка перемикання контрасту */
   .contrast-toggle {
-      background: #ffffff;
-      color: #263238;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+  
+      background: #f7f8f5;
+      color: #285b38;
+      border: 1px solid #dfe5dd;
+      border-radius: 9px;
+  
+      font-family: inherit;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+  
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      transition: background 0.2s ease,
+                  color 0.2s ease,
+                  border-color 0.2s ease;
   }
   
   .contrast-toggle:hover {
-      background: #f1f5f9;
-      border-color: #94a3b8;
+      background: #eaf1e8;
+      border-color: #9bb59c;
   }
   
   .contrast-toggle:focus-visible {
@@ -1219,7 +1232,7 @@ a {
       outline-offset: 3px;
   }
   
-  /* У висококонтрастному режимі залишаємо чорно-білий стиль */
+  /* Висококонтрастний режим */
   body.high-contrast .contrast-toggle {
       background: #000000;
       color: #ffffff;

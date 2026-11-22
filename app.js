@@ -105,7 +105,6 @@ async function loadPlaces() {
 
                         <h3>${esc(p.name)}</h3>
                         <p class="place-description">${esc(p.description)}</p>
-
                         <div class="place-address">
                             ⌖
                             ${

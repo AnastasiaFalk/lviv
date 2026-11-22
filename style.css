@@ -1194,3 +1194,34 @@ a {
       background: #000000 !important;
       text-decoration: none !important;
   }
+
+  /* Кнопка перемикання контрасту — звичайний режим */
+  .contrast-toggle {
+      background: #ffffff;
+      color: #263238;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .contrast-toggle:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+  }
+  
+  .contrast-toggle:focus-visible {
+      outline: 3px solid #2563eb;
+      outline-offset: 3px;
+  }
+  
+  /* У висококонтрастному режимі залишаємо чорно-білий стиль */
+  body.high-contrast .contrast-toggle {
+      background: #000000;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+  }

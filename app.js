@@ -119,17 +119,6 @@ async function loadPlaces() {
                                     : `<span>${esc(p.address)}</span>`
                             }
                         </div>
-
-                        ${
-                            p.maps_url
-                                ? `<a
-                                    class="map-link"
-                                    href="${esc(p.maps_url)}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >Відкрити на карті ↗</a>`
-                                : ""
-                        }
                     </div>
                 </article>
             `;

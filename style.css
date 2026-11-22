@@ -1062,12 +1062,7 @@ a {
     padding: 14px;
   }
 
-  /* На мобільному теж 18px */
-  .accessibility-field > legend {
-    font-size: 18px !important;
-  }
-
-  .accessibility-option {
+   .accessibility-option {
     font-size: 15px;
   }
 }

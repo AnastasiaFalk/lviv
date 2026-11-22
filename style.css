@@ -802,8 +802,9 @@ a {
   min-width: 0;
 }
 
+/* Єдиний розмір заголовків груп у формі */
+
 .accessibility-field legend {
-  padding: 0 8px;
   font-size: 18px;
   font-weight: 700;
   color: #344238;

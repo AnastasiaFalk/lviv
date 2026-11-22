@@ -1191,7 +1191,7 @@ body.high-contrast {
   outline-offset: 4px;
 }
 
-/* HIGH CONTRAST NAVIGATION */
+/* FIX: high contrast navigation */
 
 body.high-contrast .main-nav .add-link {
   background: #000000;
@@ -1210,13 +1210,15 @@ body.high-contrast .main-nav .contrast-toggle {
   border: 2px solid #000000;
 }
 
+/* FIX: force white text on add link */
+
 body.high-contrast .main-nav a.add-link {
   color: #ffffff !important;
   background: #000000 !important;
   text-decoration: none !important;
 }
 
-/* CONTRAST TOGGLE BUTTON */
+/* Кнопка перемикання контрасту */
 
 .contrast-toggle {
   appearance: none;
@@ -1226,18 +1228,15 @@ body.high-contrast .main-nav a.add-link {
   justify-content: center;
   min-height: 44px;
   padding: 0 16px;
-
   background: #f7f8f5;
   color: #285b38;
   border: 1px solid #dfe5dd;
   border-radius: 9px;
-
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-
   cursor: pointer;
   transition: background 0.2s ease,
               color 0.2s ease,
@@ -1253,6 +1252,8 @@ body.high-contrast .main-nav a.add-link {
   outline: 3px solid #2563eb;
   outline-offset: 3px;
 }
+
+/* Висококонтрастний режим */
 
 body.high-contrast .contrast-toggle {
   background: #000000;

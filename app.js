@@ -83,10 +83,17 @@ async function loadPlaces() {
                     .getPublicUrl(place.photo_path).data.publicUrl
                 : "";
 
-            // Автоматичне посилання Google Maps із координат.
-            // Для старих записів використовуємо maps_url.
-            const mapUrl =
-                place.latitude != null && place.longitude != null
+            // Пошук закладу в Google Maps за назвою та адресою.
+            // Координати використовуються як запасний варіант.
+            const mapQuery = [
+                place.name,
+                place.address,
+                "Львів"
+            ].filter(Boolean).join(", ");
+
+            const mapUrl = mapQuery
+                ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+                : place.latitude != null && place.longitude != null
                     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                         `${place.latitude},${place.longitude}`
                     )}`
@@ -213,8 +220,6 @@ function setupAddressSearch() {
     }
 
     const LVIV_CENTER = { lat: 49.8397, lon: 24.0297 };
-
-    // Прямокутна область пошуку; це не остаточна межа міста.
     const LVIV_BBOX = [23.90, 49.75, 24.15, 49.90];
 
     let debounceTimer;

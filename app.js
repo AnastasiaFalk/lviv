@@ -83,6 +83,15 @@ async function loadPlaces() {
                     .getPublicUrl(place.photo_path).data.publicUrl
                 : "";
 
+            // Автоматичне посилання Google Maps із координат.
+            // Для старих записів використовуємо maps_url.
+            const mapUrl =
+                place.latitude != null && place.longitude != null
+                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${place.latitude},${place.longitude}`
+                    )}`
+                    : place.maps_url || "";
+
             const features = Array.isArray(place.accessibility_features)
                 ? place.accessibility_features
                     .filter((feature) => accessibilityFeatureNames[feature])
@@ -134,8 +143,8 @@ async function loadPlaces() {
                         <div class="place-address">
                             ⌖
                             ${
-                                place.maps_url
-                                    ? `<a href="${esc(place.maps_url)}"
+                                mapUrl
+                                    ? `<a href="${esc(mapUrl)}"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         class="address-link">${esc(place.address)}</a>`
@@ -205,7 +214,7 @@ function setupAddressSearch() {
 
     const LVIV_CENTER = { lat: 49.8397, lon: 24.0297 };
 
-    // Прямокутна область попереднього пошуку; це не остаточна межа міста.
+    // Прямокутна область пошуку; це не остаточна межа міста.
     const LVIV_BBOX = [23.90, 49.75, 24.15, 49.90];
 
     let debounceTimer;

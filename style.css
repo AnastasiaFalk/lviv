@@ -1248,3 +1248,68 @@ body.high-contrast .contrast-toggle {
   color: #ffffff;
   border: 2px solid #ffffff;
 }
+
+
+/* ADDRESS SEARCH */
+
+.address-suggestions {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dfe5dd;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 5px 18px #172a1b12;
+  z-index: 1000;
+}
+
+.address-suggestions[hidden] {
+  display: none;
+}
+
+.address-suggestion {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-bottom: 1px solid #edf0eb;
+  background: #fff;
+  color: #26352b;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.address-suggestion:last-child {
+  border-bottom: 0;
+}
+
+.address-suggestion:hover,
+.address-suggestion:focus-visible {
+  background: #eaf2e9;
+}
+
+.place-map {
+  width: 100%;
+  height: 320px;
+  border: 1px solid #dfe5dd;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+#address-message {
+  margin: 0;
+}
+
+.high-contrast .address-suggestions,
+.high-contrast .address-suggestion,
+.high-contrast .place-map {
+  border: 2px solid #000;
+}
+
+.high-contrast .address-suggestion {
+  background: #fff;
+  color: #000;
+}
+

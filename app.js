@@ -432,10 +432,11 @@ function setupAddressSearch() {
         requestController = new AbortController();
 
         const params = new URLSearchParams({
-            q: `${query}, Львів, Україна`,
+            q: `${query}, Lviv, Ukraine`,
             limit: "6",
-            lang: "uk",
+            lang: "default",
             bbox: LVIV_BBOX.join(","),
+            countrycode: "ua",
             lat: String(LVIV_CENTER[0]),
             lon: String(LVIV_CENTER[1])
         });

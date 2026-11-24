@@ -10,6 +10,10 @@
             href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
             rel="stylesheet"
         />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        />
         <link rel="stylesheet" href="style.css" />
     </head>
 
@@ -96,14 +100,28 @@
                     </fieldset>
 
                     <div class="field">
-                        <label for="address">Адреса <i>*</i></label>
+                        <label for="address">Адреса у Львові <i>*</i></label>
+                    
                         <input
                             id="address"
                             name="address"
+                            type="text"
                             maxlength="250"
                             required
-                            placeholder="Вулиця та номер будинку, Львів"
+                            autocomplete="off"
+                            placeholder="Почніть вводити адресу у Львові..."
                         />
+                    
+                        <div id="address-suggestions" class="address-suggestions"></div>
+                    
+                        <p id="address-message" class="field-hint">
+                            Знайдіть адресу та підтвердьте розташування на карті.
+                        </p>
+                    
+                        <div id="place-map" class="place-map"></div>
+                    
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
                     </div>
 
                     <div class="field">
@@ -257,6 +275,7 @@
             defer
         ></script>
 
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script type="module" src="app.js"></script>
     </body>
 </html>

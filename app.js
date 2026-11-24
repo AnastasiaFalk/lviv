@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
     SUPABASE_URL,
@@ -8,14 +7,14 @@ import {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const esc = (s) =>
-    String(s ?? "").replace(/[&<>"']/g, (c) => ({
+const esc = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#39;"
-    })[c]);
+    })[char]);
 
 const accessibilityFeatureNames = {
     step_free_entrance: "Вхід без сходинок",
@@ -34,12 +33,13 @@ const categoryNames = {
     other: "Інше"
 };
 
-// Завантаження каталогу
+/* CATALOG */
+
 async function loadPlaces() {
     const target = document.querySelector("#places");
     if (!target) return;
 
-    const msg = document.querySelector("#message");
+    const message = document.querySelector("#message");
 
     const { data, error } = await supabase
         .from("places")
@@ -47,32 +47,47 @@ async function loadPlaces() {
         .order("created_at", { ascending: false });
 
     if (error) {
-        msg.textContent = "Не вдалося завантажити каталог. Перевірте налаштування Supabase.";
-        console.error(error);
+        if (message) {
+            message.textContent =
+                "Не вдалося завантажити каталог. Перевірте налаштування Supabase.";
+        }
+        console.error("Supabase loadPlaces error:", error);
         return;
     }
 
+    const places = data || [];
     let activeStatus = "";
 
     const render = () => {
-        const q = document.querySelector("#search")
-            .value.trim().toLocaleLowerCase("uk");
+        const searchInput = document.querySelector("#search");
+        const categoryInput = document.querySelector("#category");
 
-        const cat = document.querySelector("#category").value;
+        const query = (searchInput?.value || "")
+            .trim()
+            .toLocaleLowerCase("uk");
 
-        const rows = data.filter((p) =>
-            (`${p.name} ${p.address}`)
+        const category = categoryInput?.value || "";
+
+        const rows = places.filter((place) =>
+            (`${place.name || ""} ${place.address || ""}`)
                 .toLocaleLowerCase("uk")
-                .includes(q) &&
-            (!activeStatus || p.status === activeStatus) &&
-            (!cat || p.category === cat)
+                .includes(query) &&
+            (!activeStatus || place.status === activeStatus) &&
+            (!category || place.category === category)
         );
 
-        target.innerHTML = rows.map((p) => {
-            const photo = p.photo_path
+        target.innerHTML = rows.map((place) => {
+            const photo = place.photo_path
                 ? supabase.storage
                     .from(STORAGE_BUCKET)
-                    .getPublicUrl(p.photo_path).data.publicUrl
+                    .getPublicUrl(place.photo_path).data.publicUrl
+                : "";
+
+            const features = Array.isArray(place.accessibility_features)
+                ? place.accessibility_features
+                    .filter((feature) => accessibilityFeatureNames[feature])
+                    .map((feature) => `<li>${esc(accessibilityFeatureNames[feature])}</li>`)
+                    .join("")
                 : "";
 
             return `
@@ -80,65 +95,51 @@ async function loadPlaces() {
                     <div class="place-image-wrap">
                         ${
                             photo
-                                ? `<img
-                                    class="place-image"
+                                ? `<img class="place-image"
                                     src="${esc(photo)}"
-                                    alt="${esc(p.photo_alt)}"
-                                    loading="lazy"
-                                >`
+                                    alt="${esc(place.photo_alt)}"
+                                    loading="lazy">`
                                 : `<div class="photo-placeholder">⌖</div>`
                         }
-
                         <span class="status-pill ${
-                            p.status === "accessible"
+                            place.status === "accessible"
                                 ? "status-positive"
                                 : "status-negative"
                         }">
                             ${
-                                p.status === "accessible"
+                                place.status === "accessible"
                                     ? "✓ Вдале рішення"
                                     : "! Невдале рішення"
                             }
                         </span>
                     </div>
-
                     <div class="place-content">
                         ${
-                            p.category
+                            place.category
                                 ? `<p class="category-label">${
-                                    esc(categoryNames[p.category] || p.category)
+                                    esc(categoryNames[place.category] || place.category)
                                 }</p>`
                                 : ""
                         }
-
-                        <h3>${esc(p.name)}</h3>
-                        <p class="place-description">${esc(p.description)}</p>
+                        <h3>${esc(place.name)}</h3>
+                        <p class="place-description">${esc(place.description)}</p>
                         ${
-                            Array.isArray(p.accessibility_features) &&
-                            p.accessibility_features.length
+                            features
                                 ? `<div class="accessibility-features">
                                     <h4>Характеристики доступності</h4>
-                                    <ul>
-                                        ${p.accessibility_features
-                                            .filter((feature) => accessibilityFeatureNames[feature])
-                                            .map((feature) => `
-                                                <li>${esc(accessibilityFeatureNames[feature])}</li>
-                                            `).join("")}
-                                    </ul>
+                                    <ul>${features}</ul>
                                 </div>`
                                 : ""
                         }
                         <div class="place-address">
                             ⌖
                             ${
-                                p.maps_url
-                                    ? `<a
-                                        href="${esc(p.maps_url)}"
+                                place.maps_url
+                                    ? `<a href="${esc(place.maps_url)}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="address-link"
-                                    >${esc(p.address)}</a>`
-                                    : `<span>${esc(p.address)}</span>`
+                                        class="address-link">${esc(place.address)}</a>`
+                                    : `<span>${esc(place.address)}</span>`
                             }
                         </div>
                     </div>
@@ -146,29 +147,29 @@ async function loadPlaces() {
             `;
         }).join("");
 
-        msg.innerHTML = rows.length
-            ? `Знайдено прикладів: <strong>${rows.length}</strong>`
-            : `
-                <div class="empty-state">
-                    <span class="empty-icon">⌕</span>
-                    <h3>${data.length ? "Нічого не знайдено" : "Каталог поки порожній"}</h3>
-                    <p>
-                        ${
-                            data.length
+        if (message) {
+            message.innerHTML = rows.length
+                ? `Знайдено прикладів: <strong>${rows.length}</strong>`
+                : `
+                    <div class="empty-state">
+                        <span class="empty-icon">⌕</span>
+                        <h3>${places.length ? "Нічого не знайдено" : "Каталог поки порожній"}</h3>
+                        <p>${
+                            places.length
                                 ? "Спробуйте змінити пошук або фільтри."
                                 : "Додайте перший приклад доступності у Львові."
-                        }
-                    </p>
-                </div>
-            `;
+                        }</p>
+                    </div>
+                `;
+        }
     };
 
-    document.querySelector("#search").addEventListener("input", render);
-    document.querySelector("#category").addEventListener("change", render);
+    document.querySelector("#search")?.addEventListener("input", render);
+    document.querySelector("#category")?.addEventListener("change", render);
 
     document.querySelectorAll(".filter-tab").forEach((button) => {
         button.addEventListener("click", () => {
-            activeStatus = button.dataset.status;
+            activeStatus = button.dataset.status || "";
 
             document.querySelectorAll(".filter-tab").forEach((item) => {
                 item.classList.toggle("active", item === button);
@@ -181,33 +182,226 @@ async function loadPlaces() {
     render();
 }
 
-// Форма додавання місця
+/* ADDRESS AUTOCOMPLETE */
+
+function setupAddressSearch() {
+    const addressInput = document.querySelector("#address");
+    const suggestions = document.querySelector("#address-suggestions");
+    const message = document.querySelector("#address-message");
+    const latitudeInput = document.querySelector("#latitude");
+    const longitudeInput = document.querySelector("#longitude");
+
+    if (!addressInput) return;
+
+    if (!suggestions || !message || !latitudeInput || !longitudeInput) {
+        console.error("Address autocomplete: не знайдені всі потрібні HTML-елементи.", {
+            suggestions: !!suggestions,
+            message: !!message,
+            latitude: !!latitudeInput,
+            longitude: !!longitudeInput
+        });
+        return;
+    }
+
+    const LVIV_CENTER = { lat: 49.8397, lon: 24.0297 };
+
+    // Прямокутна область попереднього пошуку; це не остаточна межа міста.
+    const LVIV_BBOX = [23.90, 49.75, 24.15, 49.90];
+
+    let debounceTimer;
+    let activeController;
+    let selectedAddress = false;
+
+    const setMessage = (text) => {
+        message.textContent = text;
+    };
+
+    const clearCoordinates = () => {
+        latitudeInput.value = "";
+        longitudeInput.value = "";
+        selectedAddress = false;
+    };
+
+    const closeSuggestions = () => {
+        suggestions.replaceChildren();
+        suggestions.hidden = true;
+    };
+
+    const makeAddressLabel = (properties = {}) => {
+        const street = properties.street || properties.name || "";
+        const house = properties.housenumber || "";
+        const district = properties.district || properties.city_district || "";
+
+        const streetAndHouse = [street, house].filter(Boolean).join(", ");
+        return [streetAndHouse, district, "Львів"].filter(Boolean).join(", ");
+    };
+
+    async function searchAddress(query) {
+        if (activeController) activeController.abort();
+        activeController = new AbortController();
+
+        const params = new URLSearchParams({
+            q: `${query}, Lviv, Ukraine`,
+            limit: "7",
+            lang: "default",
+            bbox: LVIV_BBOX.join(","),
+            countrycode: "UA",
+            lat: String(LVIV_CENTER.lat),
+            lon: String(LVIV_CENTER.lon)
+        });
+
+        setMessage("Шукаємо адресу…");
+
+        try {
+            const response = await fetch(
+                `https://photon.komoot.io/api/?${params.toString()}`,
+                {
+                    method: "GET",
+                    headers: { Accept: "application/json" },
+                    signal: activeController.signal
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Photon повернув HTTP ${response.status}`);
+            }
+
+            const payload = await response.json();
+
+            const results = (payload.features || []).filter((feature) => {
+                const coordinates = feature.geometry?.coordinates;
+                if (!Array.isArray(coordinates) || coordinates.length < 2) {
+                    return false;
+                }
+
+                const [longitude, latitude] = coordinates;
+                const countryCode = String(
+                    feature.properties?.countrycode || ""
+                ).toUpperCase();
+
+                return (
+                    Number.isFinite(longitude) &&
+                    Number.isFinite(latitude) &&
+                    longitude >= LVIV_BBOX[0] &&
+                    longitude <= LVIV_BBOX[2] &&
+                    latitude >= LVIV_BBOX[1] &&
+                    latitude <= LVIV_BBOX[3] &&
+                    countryCode === "UA"
+                );
+            });
+
+            closeSuggestions();
+
+            if (!results.length) {
+                setMessage(
+                    "Адресу не знайдено. Спробуйте назву вулиці та номер будинку."
+                );
+                return;
+            }
+
+            for (const feature of results) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "address-suggestion";
+                button.textContent = makeAddressLabel(feature.properties);
+
+                button.addEventListener("click", () => {
+                    const [longitude, latitude] = feature.geometry.coordinates;
+
+                    addressInput.value = makeAddressLabel(feature.properties);
+                    latitudeInput.value = String(latitude);
+                    longitudeInput.value = String(longitude);
+                    selectedAddress = true;
+
+                    closeSuggestions();
+                    setMessage("Адресу обрано. Можна надсилати форму.");
+                });
+
+                suggestions.append(button);
+            }
+
+            suggestions.hidden = false;
+            setMessage("Оберіть адресу зі списку.");
+
+        } catch (error) {
+            if (error.name === "AbortError") return;
+
+            console.error("Address autocomplete error:", error);
+            closeSuggestions();
+            setMessage(
+                "Не вдалося виконати пошук адреси. Спробуйте ще раз трохи пізніше."
+            );
+        }
+    }
+
+    addressInput.addEventListener("input", () => {
+        window.clearTimeout(debounceTimer);
+        clearCoordinates();
+        closeSuggestions();
+
+        const query = addressInput.value.trim();
+
+        if (query.length < 3) {
+            setMessage("Введіть щонайменше 3 символи адреси.");
+            return;
+        }
+
+        debounceTimer = window.setTimeout(() => {
+            searchAddress(query);
+        }, 500);
+    });
+
+    addressInput.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeSuggestions();
+    });
+
+    document.addEventListener("click", (event) => {
+        if (
+            !suggestions.contains(event.target) &&
+            event.target !== addressInput
+        ) {
+            closeSuggestions();
+        }
+    });
+
+    addressInput.addEventListener("change", () => {
+        if (!selectedAddress) clearCoordinates();
+    });
+
+    setMessage("Введіть адресу у Львові та оберіть її зі списку.");
+
+    console.info("Address autocomplete initialized.");
+}
+
+/* ADD PLACE FORM */
+
 function setupForm() {
     const form = document.querySelector("#place-form");
     if (!form) return;
 
-    const desc = form.querySelector('[name="description"]');
+    const description = form.querySelector('[name="description"]');
     const photoInput = form.querySelector('[name="photo"]');
-    const msg = document.querySelector("#form-message");
-    const btn = form.querySelector('button[type="submit"]');
+    const message = document.querySelector("#form-message");
+    const submitButton = form.querySelector('button[type="submit"]');
 
-    desc.addEventListener("input", () => {
-        document.querySelector("#description-count").textContent =
-            `${desc.value.length}/3000`;
+    description?.addEventListener("input", () => {
+        const counter = document.querySelector("#description-count");
+        if (counter) counter.textContent = `${description.value.length}/3000`;
     });
 
-    photoInput.addEventListener("change", (event) => {
-        document.querySelector("#file-name").textContent =
-            event.target.files[0]?.name || "Оберіть фотографію";
+    photoInput?.addEventListener("change", (event) => {
+        const fileName = document.querySelector("#file-name");
+        if (fileName) {
+            fileName.textContent =
+                event.target.files[0]?.name || "Оберіть фотографію";
+        }
     });
 
     form.querySelectorAll('input[name="status"]').forEach((radio) => {
         radio.addEventListener("change", () => {
             form.querySelectorAll(".choice-card").forEach((card) => {
-                card.classList.toggle(
-                    "selected",
-                    card.querySelector("input").checked
-                );
+                const cardRadio = card.querySelector('input[name="status"]');
+                card.classList.toggle("selected", !!cardRadio?.checked);
             });
         });
     });
@@ -215,20 +409,22 @@ function setupForm() {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
+        if (!message || !submitButton) return;
+
         const formData = new FormData(form);
         const file = formData.get("photo");
         const captchaToken = formData.get("cf-turnstile-response");
         const latitude = formData.get("latitude");
         const longitude = formData.get("longitude");
-        
+
         if (!latitude || !longitude) {
-            msg.textContent = "Оберіть адресу зі списку підказок.";
-            document.querySelector("#address").focus();
+            message.textContent = "Оберіть адресу зі списку підказок.";
+            document.querySelector("#address")?.focus();
             return;
         }
 
         if (!(file instanceof File) || !file.size) {
-            msg.textContent = "Додайте фотографію.";
+            message.textContent = "Додайте фотографію.";
             return;
         }
 
@@ -236,17 +432,17 @@ function setupForm() {
             !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
             file.size > 5 * 1024 * 1024
         ) {
-            msg.textContent = "Фото має бути JPG, PNG або WebP до 5 МБ.";
+            message.textContent = "Фото має бути JPG, PNG або WebP до 5 МБ.";
             return;
         }
 
         if (!captchaToken) {
-            msg.textContent = "Підтвердіть, що ви не робот.";
+            message.textContent = "Підтвердіть, що ви не робот.";
             return;
         }
 
-        btn.disabled = true;
-        msg.textContent = "Надсилаємо ваш приклад…";
+        submitButton.disabled = true;
+        message.textContent = "Надсилаємо ваш приклад…";
 
         try {
             const response = await fetch(
@@ -273,241 +469,41 @@ function setupForm() {
 
             form.reset();
 
-            document.querySelector("#file-name").textContent =
-                "Оберіть фотографію";
+            const fileName = document.querySelector("#file-name");
+            const descriptionCount = document.querySelector("#description-count");
+            const addressMessage = document.querySelector("#address-message");
+            const suggestions = document.querySelector("#address-suggestions");
 
-            document.querySelector("#description-count").textContent =
-                "0/3000";
+            if (fileName) fileName.textContent = "Оберіть фотографію";
+            if (descriptionCount) descriptionCount.textContent = "0/3000";
+            if (addressMessage) {
+                addressMessage.textContent =
+                    "Введіть адресу у Львові та оберіть її зі списку.";
+            }
+            if (suggestions) {
+                suggestions.replaceChildren();
+                suggestions.hidden = true;
+            }
 
             form.querySelectorAll(".choice-card").forEach((card) => {
                 card.classList.remove("selected");
             });
 
-            if (window.turnstile) {
-                window.turnstile.reset();
-            }
-
-            msg.textContent =
-                "Дякуємо! Приклад успішно надіслано";
+            window.turnstile?.reset();
+            message.textContent = "Дякуємо! Приклад успішно надіслано.";
 
         } catch (error) {
-            console.error("Помилка надсилання:", error);
-
-            msg.textContent =
+            console.error("Помилка надсилання форми:", error);
+            message.textContent =
                 `Не вдалося надіслати: ${error.message || "невідома помилка"}`;
-
-            if (window.turnstile) {
-                window.turnstile.reset();
-            }
+            window.turnstile?.reset();
         } finally {
-            btn.disabled = false;
+            submitButton.disabled = false;
         }
     });
 }
 
-/* ADDRESS AUTOCOMPLETE */
-
-function setupAddressSearch() {
-    const addressInput = document.querySelector("#address");
-    const suggestions = document.querySelector("#address-suggestions");
-    const message = document.querySelector("#address-message");
-    const latitudeInput = document.querySelector("#latitude");
-    const longitudeInput = document.querySelector("#longitude");
-
-    if (
-        !addressInput ||
-        !suggestions ||
-        !message ||
-        !latitudeInput ||
-        !longitudeInput
-    ) return;
-
-    const LVIV_CENTER = {
-        lat: 49.8397,
-        lon: 24.0297
-    };
-
-    // Попередня географічна область пошуку Львова
-    const LVIV_BBOX = [
-        23.90,
-        49.75,
-        24.15,
-        49.90
-    ];
-
-    let searchTimeout = null;
-    let requestController = null;
-    let selectedAddress = false;
-
-    function clearSelection() {
-        latitudeInput.value = "";
-        longitudeInput.value = "";
-        selectedAddress = false;
-    }
-
-    function hideSuggestions() {
-        suggestions.innerHTML = "";
-        suggestions.hidden = true;
-    }
-
-    function getAddressLabel(properties) {
-        const street = properties.street || properties.name || "";
-        const house = properties.housenumber || "";
-        const district = properties.district || "";
-
-        return [
-            [street, house].filter(Boolean).join(", "),
-            district,
-            "Львів"
-        ].filter(Boolean).join(", ");
-    }
-
-    async function searchAddress(query) {
-        if (requestController) {
-            requestController.abort();
-        }
-
-        requestController = new AbortController();
-
-        const params = new URLSearchParams({
-            q: `${query}, Lviv, Ukraine`,
-            limit: "7",
-            lang: "default",
-            bbox: LVIV_BBOX.join(","),
-            countrycode: "UA",
-            lat: String(LVIV_CENTER.lat),
-            lon: String(LVIV_CENTER.lon)
-        });
-
-        try {
-            message.textContent = "Шукаємо адресу…";
-
-            const response = await fetch(
-                `https://photon.komoot.io/api/?${params}`,
-                {
-                    signal: requestController.signal
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            const results = (data.features || []).filter((feature) => {
-                const coordinates = feature.geometry?.coordinates;
-
-                if (!Array.isArray(coordinates)) return false;
-
-                const [lon, lat] = coordinates;
-
-                return (
-                    Number.isFinite(lon) &&
-                    Number.isFinite(lat) &&
-                    lon >= LVIV_BBOX[0] &&
-                    lon <= LVIV_BBOX[2] &&
-                    lat >= LVIV_BBOX[1] &&
-                    lat <= LVIV_BBOX[3] &&
-                    String(feature.properties?.countrycode || "")
-                        .toUpperCase() === "UA"
-                );
-            });
-
-            hideSuggestions();
-
-            if (!results.length) {
-                message.textContent =
-                    "Адресу не знайдено. Спробуйте ввести назву вулиці та номер будинку.";
-                return;
-            }
-
-            results.forEach((feature) => {
-                const properties = feature.properties;
-                const button = document.createElement("button");
-
-                button.type = "button";
-                button.className = "address-suggestion";
-                button.textContent = getAddressLabel(properties);
-
-                button.addEventListener("click", () => {
-                    const [lon, lat] = feature.geometry.coordinates;
-
-                    addressInput.value = getAddressLabel(properties);
-                    latitudeInput.value = String(lat);
-                    longitudeInput.value = String(lon);
-
-                    selectedAddress = true;
-                    hideSuggestions();
-
-                    message.textContent =
-                        "Адресу обрано. Можна надсилати форму.";
-                });
-
-                suggestions.appendChild(button);
-            });
-
-            suggestions.hidden = false;
-            message.textContent = "Оберіть адресу зі списку.";
-
-        } catch (error) {
-            if (error.name === "AbortError") return;
-
-            console.error("Address search error:", error);
-
-            message.textContent =
-                "Не вдалося виконати пошук. Спробуйте ще раз трохи пізніше.";
-        }
-    }
-
-    addressInput.addEventListener("input", () => {
-        clearTimeout(searchTimeout);
-        clearSelection();
-        hideSuggestions();
-
-        const query = addressInput.value.trim();
-
-        if (query.length < 3) {
-            message.textContent =
-                "Введіть щонайменше 3 символи адреси.";
-            return;
-        }
-
-        searchTimeout = setTimeout(() => {
-            searchAddress(query);
-        }, 600);
-    });
-
-    addressInput.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            hideSuggestions();
-        }
-    });
-
-    document.addEventListener("click", (event) => {
-        if (
-            !suggestions.contains(event.target) &&
-            event.target !== addressInput
-        ) {
-            hideSuggestions();
-        }
-    });
-
-    // Не дозволяємо залишити адресу без вибору підказки
-    addressInput.addEventListener("change", () => {
-        if (!selectedAddress) {
-            clearSelection();
-        }
-    });
-
-    message.textContent =
-        "Введіть адресу у Львові та оберіть її зі списку.";
-}
-
-loadPlaces();
-setupAddressSearch();
-setupForm();
-
+/* HIGH CONTRAST */
 
 function setupContrastMode() {
     const button = document.querySelector("#contrast-toggle");
@@ -515,23 +511,50 @@ function setupContrastMode() {
 
     const applyContrast = (enabled) => {
         document.body.classList.toggle("high-contrast", enabled);
-
         button.setAttribute("aria-pressed", String(enabled));
         button.textContent = enabled
             ? "Звичайний режим"
             : "Високий контраст";
     };
 
-    const savedMode = localStorage.getItem("high-contrast") === "true";
+    let savedMode = false;
+    try {
+        savedMode = localStorage.getItem("high-contrast") === "true";
+    } catch (error) {
+        console.warn("Не вдалося прочитати налаштування контрасту:", error);
+    }
 
     applyContrast(savedMode);
 
     button.addEventListener("click", () => {
         const enabled = !document.body.classList.contains("high-contrast");
 
-        localStorage.setItem("high-contrast", String(enabled));
+        try {
+            localStorage.setItem("high-contrast", String(enabled));
+        } catch (error) {
+            console.warn("Не вдалося зберегти налаштування контрасту:", error);
+        }
+
         applyContrast(enabled);
     });
 }
 
-setupContrastMode();
+/* INITIALIZATION */
+
+function initializeApp() {
+    console.info("app.js: initializeApp запущено");
+
+    setupAddressSearch();
+    setupForm();
+    setupContrastMode();
+
+    loadPlaces().catch((error) => {
+        console.error("Помилка ініціалізації каталогу:", error);
+    });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeApp, { once: true });
+} else {
+    initializeApp();
+}

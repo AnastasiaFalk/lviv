@@ -10,10 +10,6 @@
             href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
             rel="stylesheet"
         />
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        />
         <link rel="stylesheet" href="style.css" />
     </head>
 
@@ -99,7 +95,7 @@
                         </div>
                     </fieldset>
 
-                    <div class="field">
+                    <div class="field address-field">
                         <label for="address">Адреса у Львові <i>*</i></label>
                     
                         <input
@@ -112,16 +108,27 @@
                             placeholder="Почніть вводити адресу у Львові..."
                         />
                     
-                        <div id="address-suggestions" class="address-suggestions"></div>
+                        <div
+                            id="address-suggestions"
+                            class="address-suggestions"
+                            hidden
+                        ></div>
                     
                         <p id="address-message" class="field-hint">
-                            Знайдіть адресу та підтвердьте розташування на карті.
+                            Почніть вводити адресу та оберіть її зі списку.
                         </p>
                     
-                        <div id="place-map" class="place-map"></div>
+                        <input
+                            type="hidden"
+                            id="latitude"
+                            name="latitude"
+                        />
                     
-                        <input type="hidden" id="latitude" name="latitude">
-                        <input type="hidden" id="longitude" name="longitude">
+                        <input
+                            type="hidden"
+                            id="longitude"
+                            name="longitude"
+                        />
                     </div>
 
                     <div class="field">

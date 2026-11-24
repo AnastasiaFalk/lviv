@@ -297,7 +297,253 @@ function setupForm() {
     });
 }
 
+
+/* ADDRESS SEARCH AND MAP */
+
+function setupAddressSearch() {
+    const addressInput = document.querySelector("#address");
+    const suggestions = document.querySelector("#address-suggestions");
+    const message = document.querySelector("#address-message");
+    const mapElement = document.querySelector("#place-map");
+    const latitudeInput = document.querySelector("#latitude");
+    const longitudeInput = document.querySelector("#longitude");
+
+    if (
+        !addressInput ||
+        !suggestions ||
+        !mapElement ||
+        !latitudeInput ||
+        !longitudeInput
+    ) return;
+
+    if (!window.L) {
+        message.textContent = "Не вдалося завантажити карту.";
+        return;
+    }
+
+    // Орієнтовна область пошуку навколо Львова
+    const LVIV_CENTER = [49.8397, 24.0297];
+
+    const LVIV_BBOX = [
+        23.90,
+        49.75,
+        24.15,
+        49.90
+    ];
+
+    const map = L.map("place-map").setView(LVIV_CENTER, 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    let marker = null;
+    let searchTimeout = null;
+    let requestController = null;
+
+    const normalize = (value) =>
+        String(value || "")
+            .trim()
+            .toLocaleLowerCase("uk")
+            .replaceAll("'", "");
+
+    function isLvivResult(properties) {
+        const city = normalize(properties.city);
+        const country = normalize(properties.country);
+        const countryCode = normalize(properties.countrycode);
+
+        return (
+            ["львів", "lviv"].includes(city) &&
+            (
+                country.includes("україн") ||
+                country.includes("ukraine") ||
+                countryCode === "ua"
+            )
+        );
+    }
+
+    function clearSelection() {
+        latitudeInput.value = "";
+        longitudeInput.value = "";
+
+        if (marker) {
+            map.removeLayer(marker);
+            marker = null;
+        }
+    }
+
+    function selectAddress(feature) {
+        const properties = feature.properties;
+        const coordinates = feature.geometry.coordinates;
+
+        const longitude = Number(coordinates[0]);
+        const latitude = Number(coordinates[1]);
+
+        if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude) ||
+            !isLvivResult(properties)
+        ) {
+            message.textContent = "Оберіть адресу в межах Львова.";
+            return;
+        }
+
+        const street = properties.street || properties.name || "";
+        const houseNumber = properties.housenumber || "";
+        const district = properties.district || "";
+
+        const addressParts = [
+            street,
+            houseNumber,
+            district,
+            "Львів"
+        ].filter(Boolean);
+
+        addressInput.value = addressParts.join(", ");
+
+        latitudeInput.value = latitude;
+        longitudeInput.value = longitude;
+
+        suggestions.innerHTML = "";
+        suggestions.hidden = true;
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        marker = L.marker([latitude, longitude]).addTo(map);
+
+        marker.bindPopup(
+            `<strong>${addressInput.value}</strong>`
+        ).openPopup();
+
+        map.setView([latitude, longitude], 17);
+
+        message.textContent =
+            "Адресу знайдено. Перевірте розташування маркера на карті.";
+    }
+
+    async function searchAddress(query) {
+        if (requestController) {
+            requestController.abort();
+        }
+
+        requestController = new AbortController();
+
+        const params = new URLSearchParams({
+            q: `${query}, Львів, Україна`,
+            limit: "6",
+            lang: "uk",
+            bbox: LVIV_BBOX.join(","),
+            lat: String(LVIV_CENTER[0]),
+            lon: String(LVIV_CENTER[1])
+        });
+
+        try {
+            message.textContent = "Шукаємо адресу у Львові…";
+
+            const response = await fetch(
+                `https://photon.komoot.io/api/?${params}`,
+                { signal: requestController.signal }
+            );
+
+            if (!response.ok) {
+                throw new Error("Помилка пошуку адреси.");
+            }
+
+            const data = await response.json();
+
+            const results = (data.features || [])
+                .filter((feature) => isLvivResult(feature.properties));
+
+            suggestions.innerHTML = "";
+
+            if (!results.length) {
+                suggestions.hidden = true;
+                message.textContent =
+                    "Адресу у Львові не знайдено. Спробуйте уточнити запит.";
+                return;
+            }
+
+            results.forEach((feature) => {
+                const properties = feature.properties;
+
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "address-suggestion";
+
+                const parts = [
+                    properties.name,
+                    properties.street,
+                    properties.housenumber,
+                    properties.district,
+                    "Львів"
+                ].filter(Boolean);
+
+                button.textContent = [...new Set(parts)].join(", ");
+
+                button.addEventListener("click", () => {
+                    selectAddress(feature);
+                });
+
+                suggestions.appendChild(button);
+            });
+
+            suggestions.hidden = false;
+            message.textContent = "Оберіть потрібну адресу зі списку.";
+
+        } catch (error) {
+            if (error.name === "AbortError") return;
+
+            console.error("Address search error:", error);
+
+            message.textContent =
+                "Не вдалося знайти адресу. Спробуйте ще раз.";
+        }
+    }
+
+    addressInput.addEventListener("input", () => {
+        clearTimeout(searchTimeout);
+        clearSelection();
+
+        suggestions.innerHTML = "";
+        suggestions.hidden = true;
+
+        const query = addressInput.value.trim();
+
+        if (query.length < 3) {
+            message.textContent =
+                "Введіть щонайменше 3 символи адреси у Львові.";
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            searchAddress(query);
+        }, 700);
+    });
+
+    addressInput.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            suggestions.hidden = true;
+        }
+    });
+
+    document.addEventListener("click", (event) => {
+        if (
+            !suggestions.contains(event.target) &&
+            event.target !== addressInput
+        ) {
+            suggestions.hidden = true;
+        }
+    });
+
+    message.textContent =
+        "Введіть адресу у Львові, щоб знайти її на карті.";
+}
+
 loadPlaces();
+setupAddressSearch();
 setupForm();
 
 
